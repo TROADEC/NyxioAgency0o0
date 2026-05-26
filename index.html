@@ -301,6 +301,9 @@ body:not(.app-ready) .mobile-bottom-nav{display:none!important}
 .notification{bottom:70px!important;right:10px!important;left:10px!important;font-size:12px!important;padding:10px 14px!important}
 input:not([type=range]):not([type=checkbox]),select,textarea{font-size:16px!important}
 .card-h{font-size:13px!important}
+body{background-color:var(--bg)!important;background-image:url('bg-mobile.png.png')!important;background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-attachment:fixed!important}
+body::before{content:'';position:fixed;inset:0;background:linear-gradient(160deg,rgba(5,2,18,0.78) 0%,rgba(8,3,28,0.68) 40%,rgba(5,2,18,0.80) 100%);z-index:0;pointer-events:none}
+#landing,#app,.mobile-bottom-nav,.modal-overlay,.notification{position:relative;z-index:1}
 }
 /* ── LANDSCAPE MOBILE ── */
 @media(max-height:500px) and (orientation:landscape){
