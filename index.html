@@ -244,15 +244,14 @@ body.ba-neon .btn-v,body.ba-neon .btn-prim{animation:baNeon var(--ba-speed) line
 .mob-overlay.active{display:block}
 .mob-hamburger{display:none;background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0}
 .mob-hamburger:hover{color:var(--neon)}
-.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:70px;background:rgba(13,10,46,0.98);border-top:1px solid var(--border);z-index:500;justify-content:space-around;align-items:center;backdrop-filter:blur(12px)}
-.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:9px;font-weight:700;cursor:pointer;padding:6px 2px;transition:color 0.2s;position:relative;-webkit-tap-highlight-color:transparent;min-height:58px}
-.mob-support-btn{color:#fbbf24!important}
-.mob-support-btn:hover{color:#f59e0b!important}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:70px;background:rgba(5,2,20,0.97);border-top:1px solid rgba(124,58,237,0.25);box-shadow:0 -6px 32px rgba(0,0,0,0.5);z-index:500;justify-content:space-around;align-items:center;backdrop-filter:blur(20px);padding:0 2px}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:9px;font-weight:700;cursor:pointer;padding:6px 2px;transition:color 0.25s,background 0.25s,transform 0.15s;position:relative;-webkit-tap-highlight-color:transparent;min-height:58px;border-radius:12px}
 .mob-logout-btn{color:#f87171!important}
 .mob-logout-btn:hover{color:#ef4444!important}
-.mob-nav-btn .mob-icon{font-size:22px;line-height:1.2;display:block}
-.mob-nav-btn.active{color:var(--neon)}
-.mob-nav-btn.active::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--v);border-radius:0 0 2px 2px;box-shadow:0 0 8px var(--v)}
+.mob-nav-btn .mob-icon{font-size:22px;line-height:1.2;display:block;transition:transform 0.25s,filter 0.25s}
+.mob-nav-btn.active{color:var(--neon);background:rgba(124,58,237,0.13)}
+.mob-nav-btn.active .mob-icon{transform:scale(1.18) translateY(-1px);filter:drop-shadow(0 0 8px rgba(124,58,237,0.9))}
+.mob-nav-btn.active::after{content:'';position:absolute;top:0;left:15%;right:15%;height:3px;background:linear-gradient(90deg,var(--v),var(--neon));border-radius:0 0 4px 4px;box-shadow:0 0 14px var(--v),0 0 6px var(--neon)}
 @media(max-width:768px){
 :root{--sidebar-w:0px}
 body:not(.app-ready) .mobile-bottom-nav{display:none!important}
@@ -385,11 +384,16 @@ input:not([type=range]):not([type=checkbox]),select,textarea{font-size:16px!impo
 /* Glow pulsé sur le bouton actif de nav */
 @keyframes navPulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 16px rgba(124,58,237,0.5)}}
 .nav-btn.active{animation:navPulse 2.5s ease infinite}
-.mob-nav-btn.active::after{animation:baPulse 2s ease infinite}
+@keyframes baPulse{0%,100%{opacity:0.8;box-shadow:0 0 8px var(--v)}50%{opacity:1;box-shadow:0 0 18px var(--v),0 0 8px var(--neon)}}
+.mob-nav-btn.active::after{animation:baPulse 2.2s ease infinite}
 
-/* Bounce sur les icônes de la barre du bas au clic */
-@keyframes iconBounce{0%{transform:scale(1)}30%{transform:scale(1.4)}60%{transform:scale(0.9)}100%{transform:scale(1)}}
-.mob-nav-btn.just-clicked .mob-icon{animation:iconBounce 0.4s cubic-bezier(0.36,0.07,0.19,0.97)}
+/* Glow pulsé sur l'icône active */
+@keyframes mobIconGlow{0%,100%{filter:drop-shadow(0 0 5px rgba(124,58,237,0.7))}50%{filter:drop-shadow(0 0 12px rgba(124,58,237,1)) drop-shadow(0 0 4px var(--neon))}}
+.mob-nav-btn.active .mob-icon{animation:mobIconGlow 2.2s ease infinite}
+
+/* Bounce au clic */
+@keyframes iconBounce{0%{transform:scale(1.18) translateY(-1px)}25%{transform:scale(1.45) translateY(-3px) rotate(-8deg)}65%{transform:scale(0.95) translateY(0) rotate(3deg)}100%{transform:scale(1.18) translateY(-1px)}}
+.mob-nav-btn.just-clicked .mob-icon{animation:iconBounce 0.45s cubic-bezier(0.36,0.07,0.19,0.97)}
 
 /* Glow vert sur victoire / rouge sur défaite */
 @keyframes winGlow{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}50%{box-shadow:0 0 32px 8px rgba(52,211,153,0.35)}}
