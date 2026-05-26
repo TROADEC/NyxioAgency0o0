@@ -69,8 +69,21 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-he
 .auth-switch a{color:var(--neon);cursor:pointer;text-decoration:underline}
 .close-modal{position:absolute;top:14px;right:14px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);width:28px;height:28px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
 .close-modal:hover{border-color:var(--border2);color:var(--text)}
-#app{display:none}
+#app{display:none;opacity:0;transform:translateY(20px)}
 #app.visible{display:flex;min-height:100vh}
+@keyframes splashLogoIn{0%{opacity:0;transform:scale(0.2) rotate(-20deg)}65%{transform:scale(1.18) rotate(6deg)}85%{transform:scale(0.96) rotate(-2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes splashFadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes splashDot{0%,70%,100%{transform:scale(0.7);opacity:0.4}35%{transform:scale(1.3);opacity:1}}
+#loginTransOverlay{position:fixed;inset:0;z-index:10000;background:var(--bg,#050212);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity 0.55s ease,transform 0.55s ease}
+#loginTransOverlay.hiding{opacity:0;transform:scale(1.04);pointer-events:none}
+.trans-logo{font-size:56px;animation:splashLogoIn 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards}
+.trans-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:900;background:linear-gradient(135deg,#7c3aed,#a78bfa,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px;opacity:0;animation:splashFadeUp 0.5s 0.35s ease forwards}
+.trans-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(196,181,253,0.55);letter-spacing:2px;text-transform:uppercase;opacity:0;animation:splashFadeUp 0.5s 0.55s ease forwards}
+.trans-dots{display:flex;gap:9px;margin-top:6px}
+.trans-dot{width:9px;height:9px;border-radius:50%;background:var(--v,#7c3aed)}
+.trans-dot:nth-child(1){animation:splashDot 1.1s 0.7s ease infinite}
+.trans-dot:nth-child(2){animation:splashDot 1.1s 0.9s ease infinite}
+.trans-dot:nth-child(3){animation:splashDot 1.1s 1.1s ease infinite}
 .team-header{position:fixed;top:0;left:0;right:0;height:50px;z-index:500;background:rgba(13,10,46,0.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:12px;backdrop-filter:blur(12px)}
 .team-logo-img{width:32px;height:32px;border-radius:8px;object-fit:cover}
 .team-logo-ph{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--team-color),var(--neon));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff}
@@ -760,9 +773,24 @@ function resendCode(){_verifyCode=String(Math.floor(100000+Math.random()*900000)
 
 function acceptInvitation(){var tok=$('acceptName').dataset.token,name=$('acceptName').value.trim(),pass=$('acceptPass').value;if(!name||!pass){notify('⚠️ Remplissez tous les champs','var(--pink)');return;}notify('⏳ Vérification...','var(--cyan)');db.collection('invites').doc(tok).get().then(function(doc){var inv=doc.exists?doc.data():null;if(!inv)inv=state.pendingInvites.find(function(i){return i.token===tok;});if(!inv){notify('❌ Invitation introuvable','var(--red)');return;}auth.createUserWithEmailAndPassword(inv.email,pass).then(function(cred){var uid=cred.user.uid;var userData={uid:uid,name:name,email:inv.email,role:inv.role,team:'NyxioAgency',verified:true,adminTeamId:inv.adminTeamId,createdAt:new Date().toISOString()};db.collection('users').doc(uid).set(userData);db.collection('members').doc(uid).set({id:uid,name:name,email:inv.email,role:inv.role,joined:new Date().toLocaleDateString('fr-FR'),teamId:inv.adminTeamId});db.collection('invites').doc(tok).delete();state.currentUser=Object.assign({id:uid},userData);$('acceptInviteModal').classList.add('hidden');loadUserData(inv.adminTeamId,function(){loadMedia(inv.adminTeamId);bootApp();notify('✅ Bienvenue dans NyxioAgency !','var(--green)');});}).catch(function(err){if(err.code==='auth/email-already-in-use'){auth.signInWithEmailAndPassword(inv.email,pass).then(function(cred){db.collection('users').doc(cred.user.uid).update({adminTeamId:inv.adminTeamId,role:inv.role});state.currentUser={id:cred.user.uid,name:name,email:inv.email,role:inv.role,adminTeamId:inv.adminTeamId,verified:true};$('acceptInviteModal').classList.add('hidden');loadUserData(inv.adminTeamId,function(){bootApp();notify('✅ Connecté !','var(--green)');});}).catch(function(e){notify('❌ '+e.message,'var(--red)');});}else{notify('❌ '+err.message,'var(--red)');}});}).catch(function(){var inv=state.pendingInvites.find(function(i){return i.token===tok;});if(!inv){notify('❌ Invitation introuvable','var(--red)');return;}var user={id:Date.now(),name:name,email:inv.email,role:inv.role,team:'NyxioAgency',verified:true};state.currentUser=user;$('acceptInviteModal').classList.add('hidden');bootApp();notify('✅ Bienvenue !','var(--green)');});}
 
-function logout(){document.body.classList.remove('app-ready');if(typeof _notifUnsub!=='undefined'&&_notifUnsub){_notifUnsub();_notifUnsub=null;}if(typeof _mediaListener!=='undefined'&&_mediaListener){_mediaListener();_mediaListener=null;}try{auth.signOut();}catch(e){}state.currentUser=null;state.streamers=[];state.matches=[];state.history=[];state.members=[];var a=$('app');if(a){a.classList.remove('visible');a.style.display='none';}var l=$('landing');if(l)l.style.display='flex';applyTheme('galaxy');}
+function logout(){
+  var a=$('app');
+  if(a){a.style.transition='opacity 0.35s ease,transform 0.35s ease';a.style.opacity='0';a.style.transform='scale(0.97)';}
+  setTimeout(function(){
+    document.body.classList.remove('app-ready');if(typeof _notifUnsub!=='undefined'&&_notifUnsub){_notifUnsub();_notifUnsub=null;}if(typeof _mediaListener!=='undefined'&&_mediaListener){_mediaListener();_mediaListener=null;}try{auth.signOut();}catch(e){}state.currentUser=null;state.streamers=[];state.matches=[];state.history=[];state.members=[];
+    if(a){a.style.transition='';a.style.opacity='';a.style.transform='';a.classList.remove('visible');a.style.display='none';}
+    var l=$('landing');if(l)l.style.display='flex';applyTheme('galaxy');
+  },350);
+}
 
-function bootApp(){document.body.classList.add('app-ready');setTimeout(initPlayerDrag,500);setTimeout(runAllAnimations,800);var _bTeamId=getTeamId();if(_bTeamId&&typeof subscribeToTeamNotifications==='function')subscribeToTeamNotifications(_bTeamId);var l=$('landing');if(l)l.style.display='none';var a=$('app');if(a){a.style.display='flex';a.classList.add('visible');}var u=state.currentUser;if($('sidebarUserName'))$('sidebarUserName').textContent=u.name;if($('sidebarUserRole'))$('sidebarUserRole').textContent=u.role.toUpperCase();if($('sidebarAvatar'))$('sidebarAvatar').textContent=u.name[0].toUpperCase();if(u.team&&$('teamNameDisplay'))$('teamNameDisplay').textContent=u.team;renderDashboard();renderStreamers();renderAgenda();renderHistory();renderMembers();populateStreamerSelect();applyTheme(state.activeTheme||'galaxy');
+function bootApp(){document.body.classList.add('app-ready');setTimeout(initPlayerDrag,500);setTimeout(runAllAnimations,800);var _bTeamId=getTeamId();if(_bTeamId&&typeof subscribeToTeamNotifications==='function')subscribeToTeamNotifications(_bTeamId);
+  var l=$('landing');if(l)l.style.display='none';
+  var a=$('app');if(a){a.style.display='flex';a.classList.add('visible');}
+  var ov=document.createElement('div');ov.id='loginTransOverlay';
+  ov.innerHTML='<div class="trans-logo">🌌</div><div class="trans-title">NyxioAgency</div><div class="trans-sub">Esports Management</div><div class="trans-dots"><div class="trans-dot"></div><div class="trans-dot"></div><div class="trans-dot"></div></div>';
+  document.body.appendChild(ov);
+  var u=state.currentUser;if($('sidebarUserName'))$('sidebarUserName').textContent=u.name;if($('sidebarUserRole'))$('sidebarUserRole').textContent=u.role.toUpperCase();if($('sidebarAvatar'))$('sidebarAvatar').textContent=u.name[0].toUpperCase();if(u.team&&$('teamNameDisplay'))$('teamNameDisplay').textContent=u.team;renderDashboard();renderStreamers();renderAgenda();renderHistory();renderMembers();populateStreamerSelect();applyTheme(state.activeTheme||'galaxy');
+  setTimeout(function(){ov.classList.add('hiding');setTimeout(function(){ov.remove();if(a){a.style.transition='opacity 0.6s cubic-bezier(0.4,0,0.2,1),transform 0.6s cubic-bezier(0.4,0,0.2,1)';a.style.opacity='1';a.style.transform='translateY(0)';}},550);},1100);
   // Hide edit-only nav items for public viewer
   if(state.currentUser&&state.currentUser.isPublicViewer){
     var addBtn=$('nav-streamers');if(addBtn)addBtn.style.display='none';
