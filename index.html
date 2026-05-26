@@ -529,6 +529,32 @@ input:not([type=range]):not([type=checkbox]),select,textarea{font-size:16px!impo
 .media-filter-btn.active{background:linear-gradient(135deg,var(--vd),var(--v));color:#fff;border-color:var(--v);box-shadow:0 0 12px rgba(124,58,237,0.3)}
 .media-upload-zone{border:2px dashed var(--border2);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.3s;background:rgba(124,58,237,0.04)}
 .media-upload-zone:hover{border-color:var(--v);background:rgba(124,58,237,0.08)}
+/* ── MEDIA COMMENTS ── */
+.media-wrap{display:flex;flex-direction:column}
+.mcmt-section{background:rgba(6,3,18,0.7);border:1px solid var(--border);border-top:none;border-radius:0 0 14px 14px}
+.mcmt-toggle{width:100%;background:none;border:none;border-top:1px solid rgba(255,255,255,0.06);color:var(--muted);font-family:'Syne',sans-serif;font-size:10px;font-weight:700;padding:8px 12px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:6px;transition:color 0.2s;-webkit-tap-highlight-color:transparent;letter-spacing:0.5px}
+.mcmt-toggle:hover{color:var(--neon)}
+.mcmt-toggle .mcmt-arrow{margin-left:auto;transition:transform 0.2s;font-size:9px}
+.mcmt-toggle.open .mcmt-arrow{transform:rotate(180deg)}
+.mcmt-body{display:none;padding:10px 12px 14px}
+.mcmt-body.open{display:block}
+.mcmt-list{max-height:200px;overflow-y:auto;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.mcmt-empty{text-align:center;color:var(--muted);font-size:11px;padding:10px 0;font-family:'JetBrains Mono',monospace}
+.mcmt-item{display:flex;gap:8px;align-items:flex-start}
+.mcmt-avatar{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--vd),var(--v));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:900;color:#fff;flex-shrink:0}
+.mcmt-info{flex:1;min-width:0}
+.mcmt-author{font-size:11px;font-weight:800;color:var(--neon);font-family:'Syne',sans-serif}
+.mcmt-text{font-size:12px;color:var(--text);word-break:break-word;margin-top:2px;line-height:1.4}
+.mcmt-form{border-top:1px solid rgba(255,255,255,0.06);padding-top:10px}
+.mcmt-select{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'Syne',sans-serif;font-size:11px;padding:7px 10px;margin-bottom:7px;cursor:pointer;outline:none;transition:border-color 0.2s}
+.mcmt-select:focus{border-color:var(--v)}
+.mcmt-who{display:none;align-items:center;gap:6px;font-size:11px;color:var(--cyan);font-family:'JetBrains Mono',monospace;margin-bottom:7px;font-weight:700;padding:5px 8px;background:rgba(34,211,238,0.08);border-radius:7px;border:1px solid rgba(34,211,238,0.2)}
+.mcmt-input-row{display:flex;gap:6px}
+.mcmt-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:12px;padding:8px 10px;outline:none;transition:border-color 0.2s;font-family:'Syne',sans-serif}
+.mcmt-input:focus{border-color:var(--v)}
+.mcmt-input::placeholder{color:var(--muted)}
+.mcmt-submit{background:linear-gradient(135deg,var(--vd),var(--v));border:none;border-radius:9px;color:#fff;font-size:14px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity 0.2s,transform 0.15s;flex-shrink:0}
+.mcmt-submit:hover{opacity:0.85;transform:scale(1.08)}
 .media-viewer-note{background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.25);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--green);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 @media(max-width:768px){
   .media-grid{grid-template-columns:repeat(2,1fr)!important;gap:10px!important}
@@ -1238,13 +1264,94 @@ function renderMediaPage(){
     var actDel = isAdmin ? '<button class="media-act-btn media-act-del" onclick="deleteMedia(\'' + m.id + '\',\'' + (m.publicId||'') + '\',event)" title="Supprimer">🗑</button><div class="media-actions-sep"></div>' : '';
     var actDl = '<a class="media-act-btn media-act-dl" href="' + dlUrl + '" download="' + dlName + '" target="_blank" onclick="event.stopPropagation()" title="Télécharger">&#11015;</a>';
     var actions = '<div class="media-actions">' + actDel + actDl + '</div>';
-    return '<div class="media-card fadein" onclick="openMediaFull(\'' + m.url + '\',\'' + m.type + '\')">' + inner + actions + '</div>';
+    var card = '<div class="media-card fadein" onclick="openMediaFull(\'' + m.url + '\',\'' + m.type + '\')">' + inner + actions + '</div>';
+    var streamerOpts = '<option value="">✦ Choisir un streamer...</option>' + (state.streamers||[]).map(function(s){ return '<option value="'+s.id+'">'+(s.pseudo||s.name||'?')+'</option>'; }).join('');
+    var cmt = '<div class="mcmt-section" onclick="event.stopPropagation()">'
+      + '<button class="mcmt-toggle" id="ctog-'+m.id+'" onclick="toggleMediaComments(\''+m.id+'\')"><span>💬</span><span id="ccount-'+m.id+'">Commentaires</span><span class="mcmt-arrow">▾</span></button>'
+      + '<div class="mcmt-body" id="cbody-'+m.id+'">'
+      + '<div class="mcmt-list" id="clist-'+m.id+'"><div class="mcmt-empty">Aucun commentaire</div></div>'
+      + '<div class="mcmt-form">'
+      + '<select class="mcmt-select" id="csel-'+m.id+'" onchange="onCommentSelect(\''+m.id+'\')">' + streamerOpts + '</select>'
+      + '<div class="mcmt-who" id="cwho-'+m.id+'"><span>✍️</span><span id="cwhoname-'+m.id+'"></span><span style="color:var(--muted);margin-left:2px">commente</span></div>'
+      + '<div class="mcmt-input-row"><input class="mcmt-input" id="cinput-'+m.id+'" placeholder="Écrire un commentaire..." maxlength="280" onkeydown="if(event.key===\'Enter\')submitMediaComment(\''+m.id+'\')">'
+      + '<button class="mcmt-submit" onclick="submitMediaComment(\''+m.id+'\')">➤</button></div>'
+      + '</div></div></div>';
+    return '<div class="media-wrap">' + card + cmt + '</div>';
   }).join('');
+  var _tid = getTeamId(); if(_tid) loadAllMediaComments(_tid);
 }
 
 function setMediaFilter(cat){
   _mediaFilter = cat;
   renderMediaPage();
+}
+function toggleMediaComments(mid){
+  var body=document.getElementById('cbody-'+mid);
+  var tog=document.getElementById('ctog-'+mid);
+  if(!body||!tog)return;
+  var open=body.classList.toggle('open');
+  tog.classList.toggle('open',open);
+}
+function onCommentSelect(mid){
+  var sel=document.getElementById('csel-'+mid);
+  var who=document.getElementById('cwho-'+mid);
+  var nm=document.getElementById('cwhoname-'+mid);
+  if(!sel||!who||!nm)return;
+  if(sel.value){
+    var s=(state.streamers||[]).find(function(x){return String(x.id)===String(sel.value);});
+    nm.textContent=s?(s.pseudo||s.name||'Streamer'):'Streamer';
+    who.style.display='flex';
+  } else { who.style.display='none'; }
+}
+function submitMediaComment(mid){
+  var sel=document.getElementById('csel-'+mid);
+  var inp=document.getElementById('cinput-'+mid);
+  if(!sel||!inp)return;
+  if(!sel.value){notify('⚠️ Choisis un streamer','var(--pink)');return;}
+  var txt=inp.value.trim();
+  if(!txt){notify('⚠️ Écris un message','var(--pink)');return;}
+  var s=(state.streamers||[]).find(function(x){return String(x.id)===String(sel.value);});
+  var teamId=getTeamId();
+  var doc={id:Date.now().toString(),mediaId:mid,teamId:String(teamId),streamerId:sel.value,streamerName:s?(s.pseudo||s.name||'Streamer'):'Streamer',text:txt,createdAt:Date.now()};
+  db.collection('media_comments').doc(doc.id).set(doc).then(function(){
+    inp.value='';
+    var listEl=document.getElementById('clist-'+mid);
+    if(listEl){
+      var items=listEl.querySelectorAll('.mcmt-item');
+      var existing=[];
+      items.forEach(function(el){existing.push({streamerName:el.querySelector('.mcmt-author').textContent,text:el.querySelector('.mcmt-text').textContent,id:el.dataset.id});});
+      existing.push(doc);
+      renderCommentList(listEl,existing);
+      var cc=document.getElementById('ccount-'+mid);
+      if(cc)cc.textContent='Commentaires ('+existing.length+')';
+    }
+    notify('💬 Commentaire ajouté','var(--green)');
+  }).catch(function(){notify('❌ Erreur sauvegarde','var(--red)');});
+}
+function renderCommentList(listEl,comments){
+  if(!comments||!comments.length){listEl.innerHTML='<div class="mcmt-empty">Aucun commentaire</div>';return;}
+  listEl.innerHTML=comments.map(function(c){
+    var ini=(c.streamerName||'?')[0].toUpperCase();
+    var txt=String(c.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return '<div class="mcmt-item" data-id="'+c.id+'"><div class="mcmt-avatar">'+ini+'</div><div class="mcmt-info"><div class="mcmt-author">'+c.streamerName+'</div><div class="mcmt-text">'+txt+'</div></div></div>';
+  }).join('');
+}
+function loadAllMediaComments(teamId){
+  try{
+    db.collection('media_comments').where('teamId','==',String(teamId)).get()
+      .then(function(snap){
+        var all=snap.docs.map(function(d){return d.data();});
+        all.sort(function(a,b){return (a.createdAt||0)-(b.createdAt||0);});
+        var byMedia={};
+        all.forEach(function(c){if(!byMedia[c.mediaId])byMedia[c.mediaId]=[];byMedia[c.mediaId].push(c);});
+        Object.keys(byMedia).forEach(function(mid){
+          var listEl=document.getElementById('clist-'+mid);
+          var cc=document.getElementById('ccount-'+mid);
+          if(listEl)renderCommentList(listEl,byMedia[mid]);
+          if(cc)cc.textContent='Commentaires ('+byMedia[mid].length+')';
+        });
+      }).catch(function(e){console.error('comments error:',e.message);});
+  }catch(e){}
 }
 
 function openMediaFull(url, type){
