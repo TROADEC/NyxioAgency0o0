@@ -244,13 +244,13 @@ body.ba-neon .btn-v,body.ba-neon .btn-prim{animation:baNeon var(--ba-speed) line
 .mob-overlay.active{display:block}
 .mob-hamburger{display:none;background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;-webkit-tap-highlight-color:transparent;flex-shrink:0}
 .mob-hamburger:hover{color:var(--neon)}
-.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:62px;background:rgba(13,10,46,0.98);border-top:1px solid var(--border);z-index:500;justify-content:space-around;align-items:center;backdrop-filter:blur(12px)}
-.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:none;border:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:8px;font-weight:700;cursor:pointer;padding:5px 1px;transition:color 0.2s;position:relative;-webkit-tap-highlight-color:transparent;min-height:50px}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:70px;background:rgba(13,10,46,0.98);border-top:1px solid var(--border);z-index:500;justify-content:space-around;align-items:center;backdrop-filter:blur(12px)}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--muted);font-family:'Syne',sans-serif;font-size:9px;font-weight:700;cursor:pointer;padding:6px 2px;transition:color 0.2s;position:relative;-webkit-tap-highlight-color:transparent;min-height:58px}
 .mob-support-btn{color:#fbbf24!important}
 .mob-support-btn:hover{color:#f59e0b!important}
 .mob-logout-btn{color:#f87171!important}
 .mob-logout-btn:hover{color:#ef4444!important}
-.mob-nav-btn .mob-icon{font-size:20px;line-height:1.2;display:block}
+.mob-nav-btn .mob-icon{font-size:22px;line-height:1.2;display:block}
 .mob-nav-btn.active{color:var(--neon)}
 .mob-nav-btn.active::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--v);border-radius:0 0 2px 2px;box-shadow:0 0 8px var(--v)}
 @media(max-width:768px){
@@ -263,8 +263,8 @@ body:not(.app-ready) .mobile-bottom-nav{display:none!important}
 .page-title-bar .btn{width:100%!important;justify-content:center!important}
 .modal-overlay{padding:10px!important;align-items:flex-end!important}
 .auth-modal{border-radius:20px 20px 0 0!important;max-height:92vh!important;padding:22px 18px!important;width:100%!important;max-width:100%!important}
-.mob-nav-btn .mob-icon{font-size:18px!important}
-.mob-nav-btn{font-size:8px!important}
+.mob-nav-btn .mob-icon{font-size:20px!important}
+.mob-nav-btn{font-size:9px!important}
 #themeGrid{grid-template-columns:repeat(3,1fr)!important;gap:8px!important}
 .theme-card{padding:6px!important}
 .theme-preview{height:52px!important}
@@ -276,7 +276,7 @@ body:not(.app-ready) .mobile-bottom-nav{display:none!important}
 .mob-hamburger{display:none!important}
 .team-header{justify-content:center!important;padding:0 12px!important;gap:8px!important}
 .team-name-display{font-size:14px!important;flex:1;text-align:center}
-.main-content{margin-left:0!important;padding:12px 10px 80px!important}
+.main-content{margin-left:0!important;padding:12px 10px 86px!important}
 .mobile-bottom-nav{display:flex!important}
 .kpi-grid{grid-template-columns:repeat(2,1fr)!important;gap:8px!important;margin-bottom:14px!important}
 .kpi-card{padding:12px 10px!important}
@@ -2631,7 +2631,7 @@ window.addEventListener('load',function(){initNotifications();initBorderAnim();s
   <button class="mob-nav-btn" id="mob-music" onclick="navigate('music')"><span class="mob-icon">&#127925;</span>Musique</button>
   <button class="mob-nav-btn" id="mob-media" onclick="navigate('media')"><span class="mob-icon">&#128247;</span>M&#233;dias</button>
   <button class="mob-nav-btn" id="mob-settings" onclick="navigate('settings')"><span class="mob-icon">&#9881;&#65039;</span>R&#233;glages</button>
-  <button class="mob-nav-btn mob-support-btn" onclick="navigate('support')"><span class="mob-icon">&#128155;</span>Soutenir</button>
+  <button class="mob-nav-btn" id="mob-members" onclick="navigate('members')"><span class="mob-icon">&#128101;</span>Membres</button>
   <button class="mob-nav-btn mob-logout-btn" onclick="logout()"><span class="mob-icon">&#128682;</span>D&#233;co</button>
 </nav></body>
 </html>
