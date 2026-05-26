@@ -305,6 +305,12 @@ body{background-color:var(--bg)!important;background-image:url('bg-mobile.png.pn
 body::before{content:'';position:fixed;inset:0;background:linear-gradient(160deg,rgba(5,2,18,0.78) 0%,rgba(8,3,28,0.68) 40%,rgba(5,2,18,0.80) 100%);z-index:0;pointer-events:none}
 #landing,#app,.mobile-bottom-nav,.modal-overlay,.notification{position:relative;z-index:1}
 }
+/* ── DESKTOP BACKGROUND ── */
+@media(min-width:769px){
+body{background-color:var(--bg)!important;background-image:url('bg-desktop.png.png')!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;background-attachment:fixed!important}
+body::before{content:'';position:fixed;inset:0;background:rgba(5,2,18,0.45);z-index:0;pointer-events:none}
+#landing,#app,.modal-overlay,.notification{position:relative;z-index:1}
+}
 /* ── LANDSCAPE MOBILE ── */
 @media(max-height:500px) and (orientation:landscape){
 :root{--sidebar-w:0px}
