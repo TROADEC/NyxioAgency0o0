@@ -2056,18 +2056,20 @@ function updatePaypalLink(amt){try{var btn=$('paypalDonateBtn');if(btn)btn.href=
         <div class="kpi-card"><div class="kpi-label">Matchs joués</div><div class="kpi-val" id="kpi4" style="color:var(--pink)">0</div><div class="kpi-change">historique total</div></div>
         <div class="kpi-card"><div class="kpi-label">Total heures team</div><div class="kpi-val" id="kpi5" style="color:var(--neon);font-size:22px">0h</div><div class="kpi-change up">⏱ heures cumulées</div></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
         <div class="card dash-card"><div class="card-h">Roster</div><div class="card-sub">Tous les streamers</div><div id="dashRoster"></div></div>
-        <div class="card dash-card"><div class="card-h">Derniers matchs</div><div class="card-sub">Résultats récents</div><div id="dashMatches"></div></div>
-      </div>
-      <div class="card fadein dash-card" style="margin-top:20px" id="dashChartsCard">
-        <div class="card-h">📊 Statistiques visuelles</div>
-        <div class="card-sub">Progression de l'équipe</div>
-        <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:18px;align-items:center">
-          <div><canvas id="chartDiamonds" height="160"></canvas></div>
-          <div><canvas id="chartResults" height="160"></canvas></div>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div class="card dash-card"><div class="card-h">Derniers matchs</div><div class="card-sub">Résultats récents</div><div id="dashMatches"></div></div>
+          <div class="card fadein dash-card" id="dashChartsCard">
+            <div class="card-h">📊 Statistiques visuelles</div>
+            <div class="card-sub">Progression de l'équipe</div>
+            <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:18px;align-items:center">
+              <div><canvas id="chartDiamonds" height="160"></canvas></div>
+              <div><canvas id="chartResults" height="160"></canvas></div>
+            </div>
+            <div style="margin-top:20px"><canvas id="chartHours" height="110"></canvas></div>
+          </div>
         </div>
-        <div style="margin-top:20px"><canvas id="chartHours" height="110"></canvas></div>
       </div>
     </div>
 
