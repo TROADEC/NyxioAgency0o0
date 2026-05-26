@@ -760,7 +760,7 @@ function resendCode(){_verifyCode=String(Math.floor(100000+Math.random()*900000)
 
 function acceptInvitation(){var tok=$('acceptName').dataset.token,name=$('acceptName').value.trim(),pass=$('acceptPass').value;if(!name||!pass){notify('⚠️ Remplissez tous les champs','var(--pink)');return;}notify('⏳ Vérification...','var(--cyan)');db.collection('invites').doc(tok).get().then(function(doc){var inv=doc.exists?doc.data():null;if(!inv)inv=state.pendingInvites.find(function(i){return i.token===tok;});if(!inv){notify('❌ Invitation introuvable','var(--red)');return;}auth.createUserWithEmailAndPassword(inv.email,pass).then(function(cred){var uid=cred.user.uid;var userData={uid:uid,name:name,email:inv.email,role:inv.role,team:'NyxioAgency',verified:true,adminTeamId:inv.adminTeamId,createdAt:new Date().toISOString()};db.collection('users').doc(uid).set(userData);db.collection('members').doc(uid).set({id:uid,name:name,email:inv.email,role:inv.role,joined:new Date().toLocaleDateString('fr-FR'),teamId:inv.adminTeamId});db.collection('invites').doc(tok).delete();state.currentUser=Object.assign({id:uid},userData);$('acceptInviteModal').classList.add('hidden');loadUserData(inv.adminTeamId,function(){loadMedia(inv.adminTeamId);bootApp();notify('✅ Bienvenue dans NyxioAgency !','var(--green)');});}).catch(function(err){if(err.code==='auth/email-already-in-use'){auth.signInWithEmailAndPassword(inv.email,pass).then(function(cred){db.collection('users').doc(cred.user.uid).update({adminTeamId:inv.adminTeamId,role:inv.role});state.currentUser={id:cred.user.uid,name:name,email:inv.email,role:inv.role,adminTeamId:inv.adminTeamId,verified:true};$('acceptInviteModal').classList.add('hidden');loadUserData(inv.adminTeamId,function(){bootApp();notify('✅ Connecté !','var(--green)');});}).catch(function(e){notify('❌ '+e.message,'var(--red)');});}else{notify('❌ '+err.message,'var(--red)');}});}).catch(function(){var inv=state.pendingInvites.find(function(i){return i.token===tok;});if(!inv){notify('❌ Invitation introuvable','var(--red)');return;}var user={id:Date.now(),name:name,email:inv.email,role:inv.role,team:'NyxioAgency',verified:true};state.currentUser=user;$('acceptInviteModal').classList.add('hidden');bootApp();notify('✅ Bienvenue !','var(--green)');});}
 
-function logout(){document.body.classList.remove('app-ready');if(typeof _notifUnsub!=='undefined'&&_notifUnsub){_notifUnsub();_notifUnsub=null;}try{auth.signOut();}catch(e){}state.currentUser=null;state.streamers=[];state.matches=[];state.history=[];state.members=[];var a=$('app');if(a){a.classList.remove('visible');a.style.display='none';}var l=$('landing');if(l)l.style.display='flex';applyTheme('galaxy');}
+function logout(){document.body.classList.remove('app-ready');if(typeof _notifUnsub!=='undefined'&&_notifUnsub){_notifUnsub();_notifUnsub=null;}if(typeof _mediaListener!=='undefined'&&_mediaListener){_mediaListener();_mediaListener=null;}try{auth.signOut();}catch(e){}state.currentUser=null;state.streamers=[];state.matches=[];state.history=[];state.members=[];var a=$('app');if(a){a.classList.remove('visible');a.style.display='none';}var l=$('landing');if(l)l.style.display='flex';applyTheme('galaxy');}
 
 function bootApp(){document.body.classList.add('app-ready');setTimeout(initPlayerDrag,500);setTimeout(runAllAnimations,800);var _bTeamId=getTeamId();if(_bTeamId&&typeof subscribeToTeamNotifications==='function')subscribeToTeamNotifications(_bTeamId);var l=$('landing');if(l)l.style.display='none';var a=$('app');if(a){a.style.display='flex';a.classList.add('visible');}var u=state.currentUser;if($('sidebarUserName'))$('sidebarUserName').textContent=u.name;if($('sidebarUserRole'))$('sidebarUserRole').textContent=u.role.toUpperCase();if($('sidebarAvatar'))$('sidebarAvatar').textContent=u.name[0].toUpperCase();if(u.team&&$('teamNameDisplay'))$('teamNameDisplay').textContent=u.team;renderDashboard();renderStreamers();renderAgenda();renderHistory();renderMembers();populateStreamerSelect();applyTheme(state.activeTheme||'galaxy');
   // Hide edit-only nav items for public viewer
@@ -1291,13 +1291,23 @@ function deleteMedia(id, publicId, e){
   }).catch(function(){});
 }
 
+var _mediaListener = null;
 function loadMediaFromFirebase(teamId, callback){
   try{
-    db.collection('media').where('teamId','==',String(teamId)).orderBy('id','desc').get()
-      .then(function(snap){
-        state.medias = snap.docs.map(function(d){ return d.data(); });
-        if(callback) callback();
-      }).catch(function(){ state.medias=[]; if(callback) callback(); });
+    if(_mediaListener){ _mediaListener(); _mediaListener=null; }
+    _mediaListener = db.collection('media').where('teamId','==',String(teamId))
+      .onSnapshot(function(snap){
+        var docs = snap.docs.map(function(d){ return d.data(); });
+        docs.sort(function(a,b){ return Number(b.id)-Number(a.id); });
+        state.medias = docs;
+        var pg = document.getElementById('page-media');
+        if(pg && pg.classList.contains('active')) renderMediaPage();
+        if(callback){ callback(); callback=null; }
+      }, function(e){
+        console.error('media listener error:',e.message);
+        state.medias=[];
+        if(callback){ callback(); callback=null; }
+      });
   } catch(e){ state.medias=[]; if(callback) callback(); }
 }function navigate(page){document.querySelectorAll('.page-section').forEach(function(s){s.classList.remove('active');});document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});var pg=$('page-'+page);if(pg)pg.classList.add('active');var nb=$('nav-'+page);if(nb)nb.classList.add('active');document.querySelectorAll('.mob-nav-btn').forEach(function(b){b.classList.remove('active');});var mb=$('mob-'+page);if(mb)mb.classList.add('active');closeMobileSidebar();setTimeout(function(){initTilt();initMagnetic();initScrollReveal();},150);if(page==='dashboard')renderDashboard();
   if(page==='streamers')renderStreamers();
