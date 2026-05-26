@@ -1262,7 +1262,7 @@ function renderMediaPage(){
     var dlExt = m.type === 'video' ? '.mp4' : '.png';
     var dlName = (m.title||'media').replace(/[^a-z0-9_\-]/gi,'_') + dlExt;
     var actDel = isAdmin ? '<button class="media-act-btn media-act-del" onclick="deleteMedia(\'' + m.id + '\',\'' + (m.publicId||'') + '\',event)" title="Supprimer">🗑</button><div class="media-actions-sep"></div>' : '';
-    var actDl = '<a class="media-act-btn media-act-dl" href="' + dlUrl + '" download="' + dlName + '" target="_blank" onclick="event.stopPropagation()" title="Télécharger">&#11015;</a>';
+    var actDl = '<a class="media-act-btn media-act-dl" href="' + dlUrl + '" download="' + dlName + '" onclick="event.stopPropagation()" title="Télécharger">&#11015;</a>';
     var actions = '<div class="media-actions">' + actDel + actDl + '</div>';
     var card = '<div class="media-card fadein" onclick="openMediaFull(\'' + m.url + '\',\'' + m.type + '\')">' + inner + actions + '</div>';
     var streamerOpts = '<option value="">✦ Choisir un streamer...</option>' + (state.streamers||[]).map(function(s){ return '<option value="'+s.id+'">'+(s.pseudo||s.name||'?')+'</option>'; }).join('');
