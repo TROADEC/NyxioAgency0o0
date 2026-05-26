@@ -70,6 +70,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-he
 .close-modal{position:absolute;top:14px;right:14px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);width:28px;height:28px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
 .close-modal:hover{border-color:var(--border2);color:var(--text)}
 #app{display:none;opacity:0;transform:translateY(20px)}
+#mob-bg-layer{display:none}
 #app.visible{display:flex;min-height:100vh}
 @keyframes splashLogoIn{0%{opacity:0;transform:scale(0.2) rotate(-20deg)}65%{transform:scale(1.18) rotate(6deg)}85%{transform:scale(0.96) rotate(-2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
 @keyframes splashFadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
@@ -301,8 +302,9 @@ body:not(.app-ready) .mobile-bottom-nav{display:none!important}
 .notification{bottom:70px!important;right:10px!important;left:10px!important;font-size:12px!important;padding:10px 14px!important}
 input:not([type=range]):not([type=checkbox]),select,textarea{font-size:16px!important}
 .card-h{font-size:13px!important}
-body{background-color:var(--bg)!important;background-image:url('bg-mobile.png.png')!important;background-size:cover!important;background-position:center top!important;background-repeat:no-repeat!important;background-attachment:fixed!important}
-body::before{content:'';position:fixed;inset:0;background:linear-gradient(160deg,rgba(5,2,18,0.78) 0%,rgba(8,3,28,0.68) 40%,rgba(5,2,18,0.80) 100%);z-index:0;pointer-events:none}
+body{background-color:var(--bg)!important}
+#mob-bg-layer{display:block!important;position:fixed;inset:0;z-index:0;pointer-events:none;background:url('bg-mobile.png.png') center top / cover no-repeat}
+#mob-bg-layer::after{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(5,2,18,0.78) 0%,rgba(8,3,28,0.68) 40%,rgba(5,2,18,0.80) 100%)}
 #landing,#app,.mobile-bottom-nav,.modal-overlay,.notification{position:relative;z-index:1}
 }
 /* ── DESKTOP BACKGROUND ── */
@@ -1804,6 +1806,7 @@ function updatePaypalLink(amt){try{var btn=$('paypalDonateBtn');if(btn)btn.href=
 </head>
 <body onload="init()">
 <canvas id="galaxyBg" style="position:fixed;inset:0;z-index:0;pointer-events:none;display:none"></canvas>
+<div id="mob-bg-layer"></div>
 
 <!-- VERIFY MODAL -->
 <div class="modal-overlay hidden" id="verifyModal">
