@@ -766,7 +766,8 @@ function bootApp(){document.body.classList.add('app-ready');setTimeout(initPlaye
   // Hide edit-only nav items for public viewer
   if(state.currentUser&&state.currentUser.isPublicViewer){
     var addBtn=$('nav-streamers');if(addBtn)addBtn.style.display='none';
-    var invBtn=document.querySelector('.sidebar-bottom');
+    // Hide settings from mobile bottom nav for viewers
+    var mobSettings=document.getElementById('mob-settings');if(mobSettings)mobSettings.style.display='none';
     // Show viewer banner
     var agBtn=$('agendaAddBtn');if(agBtn)agBtn.style.display='none';
     var banner=document.createElement('div');
