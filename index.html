@@ -856,7 +856,8 @@ function checkInviteLink(){
       subscribeToHistory(viewId);
       state.currentUser={id:'viewer_'+viewId,name:'Visiteur',role:'viewer',team:'NyxioAgency',verified:true,adminTeamId:viewId,isPublicViewer:true};
       var l=$('landing');if(l)l.style.display='none';
-      var a=$('app');if(a){a.style.display='flex';a.classList.add('visible');}
+      var a=$('app');if(a){a.style.display='flex';a.classList.add('visible');a.style.opacity='1';a.style.transform='translateY(0)';}
+      document.body.classList.add('app-ready');
       if($('sidebarUserName'))$('sidebarUserName').textContent='Visiteur';
       if($('sidebarUserRole'))$('sidebarUserRole').textContent='VIEWER';
       if($('sidebarAvatar'))$('sidebarAvatar').textContent='👁';
