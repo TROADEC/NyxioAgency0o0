@@ -849,9 +849,8 @@ function checkInviteLink(){
     _viewerMode=true;
     // Clear any existing admin session so init() doesn't boot the admin app
     state.currentUser=null;
-    // Sign in anonymously so Firestore security rules allow reads
-    function _startViewerLoad(){
-      loadUserData(viewId,function(){
+    // Load viewer data directly — no auth needed for public viewer links
+    loadUserData(viewId,function(){
       loadMedia(viewId);
       subscribeToMatches(viewId);
       subscribeToHistory(viewId);
@@ -867,17 +866,7 @@ function checkInviteLink(){
       applyTheme('galaxy');
       applyViewerMode();
       notify('👁 Mode lecture seule — bienvenue !','var(--cyan)');
-      });
-    }
-    // Sign in anonymously if not already authenticated (needed for Firestore rules)
-    if(auth.currentUser){
-      _startViewerLoad();
-    } else {
-      auth.signInAnonymously().then(_startViewerLoad).catch(function(e){
-        console.warn('Anon auth failed, trying direct:', e.message);
-        _startViewerLoad();
-      });
-    }
+    });
     return;
   }
   var tok=p.get('invite');if(!tok)return;db.collection('invites').doc(tok).get().then(function(doc){if(!doc.exists){notify('❌ Lien invalide ou expiré','var(--red)');return;}var inv=doc.data();$('inviteInfo').innerHTML='<div style="font-size:24px;margin-bottom:8px">🎉</div><strong style="color:var(--neon)">'+inv.inviterName+'</strong> vous invite<br>Rôle : <span class="role-badge role-admin" style="display:inline-block;margin-top:8px">'+inv.role.toUpperCase()+'</span>';$('acceptName').dataset.token=tok;$('acceptInviteModal').classList.remove('hidden');}).catch(function(){var inv=state.pendingInvites.find(function(i){return i.token===tok;});if(!inv){notify('❌ Lien invalide','var(--red)');return;}$('inviteInfo').innerHTML='<strong style="color:var(--neon)">'+inv.inviterName+'</strong> vous invite<br>Rôle : '+inv.role.toUpperCase();$('acceptName').dataset.token=tok;$('acceptInviteModal').classList.remove('hidden');});}
