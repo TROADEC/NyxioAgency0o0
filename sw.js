@@ -1,4 +1,4 @@
-const CACHE = 'nyxioagency-v28';
+const CACHE = 'nyxioagency-v29';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
